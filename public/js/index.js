@@ -1,7 +1,9 @@
 (function () {
 	
 	$(function() {		
-		console.log('running');
+
+		$(".languageDropDown").languageDropdown();
+
 	});
 	
 }());

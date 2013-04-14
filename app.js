@@ -8,7 +8,7 @@ app.configure(function () {
 	
 	app.use(express.cookieParser());
 	app.use(express.bodyParser());
-	app.use(express.session({ secret: process.env.SESSION_SECRET || 'secret' }));
+	app.use(express.session({ secret: process.env.NEO4J_URL || 'secret' }));
 	app.use(app.router);
 	app.use(express.static(__dirname + '/public'));
 });

@@ -1,3 +1,21 @@
 body {
   padding-top: 60px; /* 60px to make the container go all the way to the bottom of the topbar */
 }
+
+.dropdown-menu {
+    max-height: 250px;
+    overflow: auto;
+}
+
+.dropdown-menu:before {
+    content:normal;
+}
+
+.img-flag {
+	width: 20px;
+	height: 20px;
+}
+
+.dropdown-menu a {
+    white-space:normal;
+}
