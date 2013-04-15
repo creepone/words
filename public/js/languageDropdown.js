@@ -41,8 +41,7 @@
 			var language = languages[iso];
 
 			var li = "<li><a href=\"#\" data-iso=\"" + iso
-				+ "\"><img class=\"img-rounded img-flag\" src=\""
-				+ languagesPath + language.icon + "\" /> "
+				+ "\"><i class=\"img-rounded img-flag " + language.icon + "\" /> "
 				+ language.name + "</a></li>";
 			lis.push(li);
 		}
@@ -62,8 +61,7 @@
 		var language = languages[iso];
 		this.attr("data-selected", iso);
 
-		var selection = "<img class=\"img-rounded img-flag\" src=\""
-			+ languagesPath + language.icon + "\" /> " + language.name + " ";
+		var selection = "<i class=\"img-rounded img-flag " + language.icon +  "\" /> " + language.name + " ";
 
 		this.find("a.btn span:first").html(selection);
 	}
@@ -80,43 +78,43 @@
 
 	// selected ISO 639-1 codes (see http://en.wikipedia.org/wiki/List_of_ISO_639-1_codes)
 	var languages = {
-		"af": { name: "Afrikaans", icon: "flag-za.png" },
-		"al": { name: "Albanian", icon: "flag-al.png" },
-		"ar": { name: "Arabic", icon: "flag-ara.png" },
-		"hy": { name: "Armenian", icon: "flag-am.png" },
-		"az": { name: "Azerbaijani", icon: "flag-az.png" },
-		"be": { name: "Belarusian", icon: "flag-by.png" },
-		"bn": { name: "Bengali", icon: "flag-bd.png" },
-		"bs": { name: "Bosnian", icon: "flag-ba.png" },
-		"bg": { name: "Bulgarian", icon: "flag-bg.png" },
-		"zh": { name: "Chinese", icon: "flag-cn.png" },
-		"hr": { name: "Croatian", icon: "flag-hr.png" },
-		"cs": { name: "Czech", icon: "flag-cz.png" },
-		"da": { name: "Danish", icon: "flag-dk.png" },
-		"nl": { name: "Dutch", icon: "flag-nl.png" },
-		"en": { name: "English", icon: "flag-gb.png" },
-		"eo": { name: "Esperanto", icon: "flag-esp.png" },
-		"et": { name: "Estonian", icon: "flag-ee.png" },
-		"fo": { name: "Faroese", icon: "flag-fo.png" },
-		"fi": { name: "Finnish", icon: "flag-fi.png" },
-		"fr": { name: "French", icon: "flag-fr.png" },
-		"ka": { name: "Georgian", icon: "flag-ge.png" },
-		"de": { name: "German", icon: "flag-de.png" },
-		"el": { name: "Greek", icon: "flag-gr.png" },
-		"he": { name: "Hebrew", icon: "flag-il.png" },
-		"hi": { name: "Hindi", icon: "flag-in.png" },
-		"hu": { name: "Hungarian", icon: "flag-hu.png" },
-		"id": { name: "Indonesian", icon: "flag-id.png" },
-		"ga": { name: "Irish", icon: "flag-ie.png" },
-		"is": { name: "Icelandic", icon: "flag-is.png" },
-		"it": { name: "Italian", icon: "flag-it.png" },
-		"ja": { name: "Japanese", icon: "flag-jp.png" },
-		"jv": { name: "Javanese", icon: "flag-id.png" },
-		"kk": { name: "Kazakh", icon: "flag-kz.png" },
+		"af": { name: "Afrikaans", icon: "flag-za" },
+		"al": { name: "Albanian", icon: "flag-al" },
+		"ar": { name: "Arabic", icon: "flag-ara" },
+		"hy": { name: "Armenian", icon: "flag-am" },
+		"az": { name: "Azerbaijani", icon: "flag-az" },
+		"be": { name: "Belarusian", icon: "flag-by" },
+		"bn": { name: "Bengali", icon: "flag-bd" },
+		"bs": { name: "Bosnian", icon: "flag-ba" },
+		"bg": { name: "Bulgarian", icon: "flag-bg" },
+		"zh": { name: "Chinese", icon: "flag-cn" },
+		"hr": { name: "Croatian", icon: "flag-hr" },
+		"cs": { name: "Czech", icon: "flag-cz" },
+		"da": { name: "Danish", icon: "flag-dk" },
+		"nl": { name: "Dutch", icon: "flag-nl" },
+		"en": { name: "English", icon: "flag-gb" },
+		"eo": { name: "Esperanto", icon: "flag-esp" },
+		"et": { name: "Estonian", icon: "flag-ee" },
+		"fo": { name: "Faroese", icon: "flag-fo" },
+		"fi": { name: "Finnish", icon: "flag-fi" },
+		"fr": { name: "French", icon: "flag-fr" },
+		"ka": { name: "Georgian", icon: "flag-ge" },
+		"de": { name: "German", icon: "flag-de" },
+		"el": { name: "Greek", icon: "flag-gr" },
+		"he": { name: "Hebrew", icon: "flag-il" },
+		"hi": { name: "Hindi", icon: "flag-in" },
+		"hu": { name: "Hungarian", icon: "flag-hu" },
+		"id": { name: "Indonesian", icon: "flag-id" },
+		"ga": { name: "Irish", icon: "flag-ie" },
+		"is": { name: "Icelandic", icon: "flag-is" },
+		"it": { name: "Italian", icon: "flag-it" },
+		"ja": { name: "Japanese", icon: "flag-jp" },
+		"jv": { name: "Javanese", icon: "flag-id" },
+		"kk": { name: "Kazakh", icon: "flag-kz" },
 
 		// todo: finish the list
 
-		"sk": { name: "Slovak", icon: "flag-sk.png" }
+		"sk": { name: "Slovak", icon: "flag-sk" }
 	};
 
 })(jQuery);

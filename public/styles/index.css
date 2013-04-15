@@ -12,10 +12,10 @@ body {
 }
 
 .img-flag {
-	width: 20px;
-	height: 20px;
+	float: left;
+	margin-right: 4px;
 }
 
 .dropdown-menu a {
-    white-space:normal;
+    white-space: normal;
 }
