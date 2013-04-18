@@ -1,76 +1,99 @@
 (function($){
 
-	$.fn.languageDropdown = function() {
-		if (arguments.length == 0) {
-			// create language dropdown hosted in the given element(s)
-			return this.each(function () {
-    			create.call($(this));
-    		});
-		}
-		else if (typeof arguments[0] == "string") {
-			switch (arguments[0]) {
-				case "selection":
-					if (arguments.length == 1) {
-						var iso = this.data("selected");
-						if (iso in languages)
-							return $.extend({}, languages[iso], { iso: iso });
-						return;
-					}
-					else if (arguments.length == 2) {
-						var iso = arguments[1];
-						if (typeof iso == "string")
-							select.call(this, iso);
-						return;
-					}
+	var _markup = [
+		"<a class=\"btn dropdown-toggle\" data-toggle=\"dropdown\" href=\"#\">",
+    		"<span>",
+    			"<i class=\"img-rounded img-flag\" data-bind=\"css: icon()\" />",
+    			"<span data-bind=\"text: name()\"></span>",
+    		"</span>",
+    		"<span> </span>",
+    		"<span class=\"caret\"></span>",
+  		"</a>",
+  		"<ul class=\"dropdown-menu\" data-bind=\"foreach: languages\">",
+  			"<li>",
+  				"<a href=\"#\" data-bind=\"attr: { 'data-iso': iso }, click: onItemClick\">",
+  					"<i class=\"img-rounded img-flag\" data-bind=\"css: icon\" />",
+  					"<span data-bind=\"text: name\"></span>",
+  				"</a>",
+  			"</li>",
+  		"</ul>"
+	].join("");
+
+	$.widget("words.languageDropdown", {
+
+		_create: function() {
+
+			this.element
+				.addClass("btn-group")
+				.append(_markup);
+
+			this._viewModel = new ViewModel({
+				iso: this.options.iso,
+				onItemClick: this._onItemClick.bind(this)
+			});
+
+			ko.applyBindings(this._viewModel, this.element[0]);
+		},
+
+		_destroy: function() {
+			ko.cleanNode(this.element[0]);
+			this.element.empty().removeClass("btn-group");
+		},
+
+		_onItemClick: function() {
+
+			var iso = $(event.target).closest("[data-iso]").data("iso");
+			if (!iso) 
+				return;
+
+			this.select(iso);
+		},
+
+		select: function(iso) {
+
+			if (!iso) {
+				if (!this._viewModel.iso)
+					return null;
+
+				return { 
+					iso: this._viewModel.iso,
+					name: this._viewModel.name()
+				};
 			}
+
+			this._viewModel.selectLanguage(iso);
 		}
+	});
 
-		throw "invalid arguments";
-	};
+	function ViewModel(o) {
 
-	function create() {
-		this.html(markup);
+		$.extend(this, {
+			languages: [],
+			icon: ko.observable(),
+			name: ko.observable("Select language")
+		});
 
-		var lis = [];
+		if (o.iso) 
+			this.selectLanguage(o.iso);
 
 		for (var iso in languages) {
-			var language = languages[iso];
-
-			var li = "<li><a href=\"#\" data-iso=\"" + iso
-				+ "\"><i class=\"img-rounded img-flag " + language.icon + "\" /> "
-				+ language.name + "</a></li>";
-			lis.push(li);
+			this.languages.push($.extend({}, languages[iso], {
+				iso: iso,
+				onItemClick: o.onItemClick
+			}));
 		}
-
-		this.find("ul").html(lis.join(""));
-
-		var self = this;
-		this.on("click", "ul", function (event) {
-			var iso = $(event.target).data("iso");
-			if (!iso) return;
-
-			select.call(self, iso);
-		});
 	}
 
-	function select(iso) {
-		var language = languages[iso];
-		this.attr("data-selected", iso);
+	$.extend(ViewModel.prototype, {
 
-		var selection = "<i class=\"img-rounded img-flag " + language.icon +  "\" /> " + language.name + " ";
+		selectLanguage: function(iso) {
 
-		this.find("a.btn span:first").html(selection);
-	}
-
-	var markup = [
-		"<div class=\"btn-group\">",
-			"<a class=\"btn dropdown-toggle\" data-toggle=\"dropdown\" href=\"#\">",
-	    		"<span>Select language </span>",
-	    		"<span class=\"caret\"></span>",
-	  		"</a>",
-	  		"<ul class=\"dropdown-menu\"></ul>",
-		"</div>"
-	].join("");
+			var lang = languages[iso];
+			this.iso = iso;
+			this.icon(lang.icon);
+			this.name(lang.name);
+		}
+	});
 
 	// selected ISO 639-1 codes (see http://en.wikipedia.org/wiki/List_of_ISO_639-1_codes)
 	var languages = {

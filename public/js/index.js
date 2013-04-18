@@ -2,7 +2,7 @@
 	
 	$(function() {		
 
-		$(".languageDropDown").languageDropdown();
+		$("#first,#second,#third").languageDropdown();
 
 	});
 	
