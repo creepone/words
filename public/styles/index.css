@@ -2,6 +2,10 @@ body {
   padding-top: 60px; /* 60px to make the container go all the way to the bottom of the topbar */
 }
 
+#third {
+	margin-top: 10px;
+}
+
 .dropdown-menu {
     max-height: 250px;
     overflow: auto;
@@ -11,11 +15,53 @@ body {
     content:normal;
 }
 
+.dropdown-menu a {
+    white-space: normal;
+}
+
+/* languageDropdown */
 .img-flag {
 	float: left;
 	margin-right: 4px;
 }
 
-.dropdown-menu a {
-    white-space: normal;
+/* sentenceEditor */
+
+.word {
+	display: inline-block;
+	padding: 5px 10px;
+	margin: 0 2px;
+	background-color: #fff;
+	border: 1px solid #ddd;
+	-webkit-border-radius: 5px;
+	-moz-border-radius: 5px;
+	border-radius: 5px;
 }
+
+.word:hover, .word:focus {
+	background-color: #f5f5f5;
+}
+
+.word[data-selected] { 
+	color: #468847;
+	background-color: #dff0d8;
+	border: 1px solid #d6e9c6;
+}
+
+.sentenceEditor {
+	position: relative;
+	margin: 15px 0;
+	padding: 19px;
+	background-color: #fbfbfb;
+	border: 1px solid #ddd;
+	-webkit-border-radius: 4px;
+	-moz-border-radius: 4px;
+	border-radius: 4px;
+}
+
+.close.reset {
+	position: absolute;
+	top: 3px;
+	left: 7px;
+}
+

@@ -2,7 +2,9 @@
 	
 	$(function() {		
 
-		$("#first,#second,#third").languageDropdown();
+		$("#firstLanguage,#secondLanguage").languageDropdown();
+
+		$("#firstSentence,#secondSentence").sentenceEditor();
 
 	});
 	

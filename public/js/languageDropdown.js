@@ -11,7 +11,7 @@
   		"</a>",
   		"<ul class=\"dropdown-menu\" data-bind=\"foreach: languages\">",
   			"<li>",
-  				"<a href=\"#\" data-bind=\"attr: { 'data-iso': iso }, click: onItemClick\">",
+  				"<a href=\"#\" data-bind=\"attr: { 'data-iso': iso }\">",
   					"<i class=\"img-rounded img-flag\" data-bind=\"css: icon\" />",
   					"<span data-bind=\"text: name\"></span>",
   				"</a>",
@@ -28,11 +28,14 @@
 				.append(_markup);
 
 			this._viewModel = new ViewModel({
-				iso: this.options.iso,
-				onItemClick: this._onItemClick.bind(this)
+				iso: this.options.iso
 			});
 
 			ko.applyBindings(this._viewModel, this.element[0]);
+
+			this._on({ 
+				"click [data-iso]": "_onItemClick"
+			});
 		},
 
 		_destroy: function() {
