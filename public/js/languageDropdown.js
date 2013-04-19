@@ -43,9 +43,9 @@
 			this.element.empty().removeClass("btn-group");
 		},
 
-		_onItemClick: function() {
+		_onItemClick: function(evt) {
 
-			var iso = $(event.target).closest("[data-iso]").data("iso");
+			var iso = $(evt.target).closest("[data-iso]").data("iso");
 			if (!iso) 
 				return;
 
