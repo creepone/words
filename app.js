@@ -31,7 +31,7 @@ function configureApp(compileStylus) {
 }
 
 function configureSprites(callback) {
-	sprite.stylus({ path: './public/images', httpPath: '/images' }, function (err, helper) {
+	sprite.stylus({ path: './public/img', httpPath: '/img' }, function (err, helper) {
 		if (err)
 			console.log(err);
 

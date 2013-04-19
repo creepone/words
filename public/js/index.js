@@ -6,6 +6,9 @@
 
 		$("#firstSentence,#secondSentence").sentenceEditor();
 
+
+		$("#word").wordEditor({ word: "Schnellverbindungsplan"});
+
 	});
 	
 }());

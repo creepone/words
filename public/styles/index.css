@@ -43,9 +43,9 @@ body {
 }
 
 .word[data-selected] { 
-	color: #468847;
-	background-color: #dff0d8;
-	border: 1px solid #d6e9c6;
+	color: #3a87ad;
+	background-color: #d9edf7;
+	border-color: #bce8f1;
 }
 
 .sentenceEditor {
@@ -64,4 +64,30 @@ body {
 	top: 3px;
 	left: 7px;
 }
+
+.sentenceEditor .merge,
+.sentenceEditor .split {
+	margin-top: 10px;
+	margin-left: 3px;
+}
+
+/* wordEditor */
+
+.letter {
+	display: inline-block;
+	padding: 1px 2px;
+	background-color: #fff;
+	border: 1px solid #ddd;
+}
+
+.letter.ui-selected, .letter.ui-selecting {
+	color: #3a87ad;
+	background-color: #d9edf7;
+	border-color: #bce8f1;
+}
+
+.wordEditor .submit {
+	color: #468847;
+}
+
 
