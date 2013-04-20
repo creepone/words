@@ -38,10 +38,10 @@
 
 			if (startIndex === null || endIndex === null)
 				return null;
-
+			
 			return {
-				start: startIndex,
-				end: endIndex
+				start: Math.min(startIndex),
+				length: Math.abs(endIndex - startIndex) + 1
 			};
 		}
 	});

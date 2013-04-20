@@ -6,19 +6,20 @@
 		"</div>",
 		
 		"<div class=\"control-group\" data-bind=\"if: !words().length, css: validationState()\">",
-			"<input data-bind=\"value: sentence, valueUpdate: 'afterkeydown'\" type=\"text\" class=\"span11\" placeholder=\"Enter the sentence and press the Return key.\" />",
+			"<input data-bind=\"value: sentence, valueUpdate: ['afterkeydown', 'afterpaste']\" type=\"text\" class=\"span11\" placeholder=\"Enter the sentence and press the Return key.\" />",
 		"</div>",
 		
 		"<div class=\"words\" data-bind=\"foreach: words()\">",
-			"<span class=\"word\" data-bind=\"text: text, attr: { 'data-selected': selected(), 'data-index': $index }\"></span>",
+			"<span class=\"word\" data-bind=\"text: text, css: { 'ui-selected': selected() }, attr: { 'data-index': $index }\"></span>",
 		"</div>",
 
-		"<div data-bind=\"if: selection().length > 1\">",
+		"<div class=\"details\" data-bind=\"if: selection().length > 1\">",
 			"<button class=\"btn btn-mini merge\">Merge</button>",
 		"</div>",
 
-		"<div data-bind=\"if: selection().length == 1\">",
+		"<div class=\"details\" data-bind=\"if: selection().length == 1\">",
 			"<button class=\"btn btn-mini split\">Split</button>",
+			"<span class=\"word-split\"></span>",
 		"</div>"
 
 	].join("");
@@ -31,22 +32,22 @@
 				.addClass("sentenceEditor")
 				.append(_markup);
 
-			this._viewModel = new ViewModel({
-			});
+			this._viewModel = new ViewModel({});
 
 			ko.applyBindings(this._viewModel, this.element[0]);
 
 			this._on({ 
 				"keydown input": "_onInputKeydown",
-				"click .word": "_onWordClick",
 				"click .reset": "_onResetClick",
-				"click .merge": "_onMergeClick"
+				"click .merge": "_onMergeClick",
+				"click .split": "_onSplitClick",
+				"selectablestop .words": "_onSelectionChange"
 			});
-
-			this.element.find(".words"); //.sortable();
+			
+			this.element.find(".words").selectable();
 		},
 
-		_destroy: function() {
+		_destroy: function() {  
 			ko.cleanNode(this.element[0]);
 			this.element.empty().removeClass("sentenceEditor");
 		},
@@ -72,15 +73,8 @@
 					}));
 				});
 			}
-		},
-
-		_onWordClick: function(evt) {
-			var index = $(evt.target).attr("data-index"),
-				word = this._viewModel.words()[index];
-
-			this._viewModel.toggleSelect(word);
-		},
-
+		}, 
+	   
 		_onResetClick: function(evt) {
 			this._viewModel.words.removeAll();
 			this._viewModel.selection.removeAll();
@@ -96,21 +90,117 @@
 			var singleWords = [].concat.apply([], words.map(function (w) { return w.words || [w]; }));
 
 			// sort the words by their natural order in the sentence
-			singleWords.sort(function (w1, w2) { return w1.occurences[0].start - w2.occurences[0].start });
+			singleWords.sort(this._compareWords);     
+			
+			var occurences = [].concat.apply([], singleWords.map(function (w) { return w.occurences; })),
+			 	mergedOccurence = this._getContinuosOccurence(occurences),
+				texts = singleWords.map(function (w) { return w.text });
+			         
+			var mergedWord = { selected: ko.observable(true) };
+			
+			if (mergedOccurence) {
+				$.extend(mergedWord, {
+					text: texts.join(""),
+					occurences: [mergedOccurence]
+				});
+			}
+			else {
+				$.extend(mergedWord, {
+					text: texts.join(" "),
+					occurences: occurences,
+					words: singleWords
+				});
+			}
 
-			var mergedWord = {
-				text: singleWords.map(function (w) { return w.text }).join(" "),
-				occurences: [].concat.apply([], singleWords.map(function (w) { return w.occurences; })),
-				words: singleWords,
-				selected: ko.observable(true)
+			vm.words.removeAll(words);
+			vm.selection.removeAll(words);
+
+			vm.words.splice(index, 0, mergedWord);
+			vm.selection.push(mergedWord);
+		},       
+		
+		_onSplitClick: function(evt) {
+			var self = this,
+				vm = this._viewModel,
+				word = vm.selection()[0];         
+				
+			var replace = function(splitWords) {
+				vm.words.remove(word);
+				vm.selection.remove(word);
+				
+				ko.utils.arrayPushAll(vm.words, splitWords);
+				ko.utils.arrayPushAll(vm.selection, splitWords);    
+				
+				vm.words.sort(self._compareWords);
 			};
-
-			this._viewModel.words.removeAll(words);
-			this._viewModel.selection.removeAll(words);
-
-			this._viewModel.words.splice(index, 0, mergedWord);
-			this._viewModel.selection.push(mergedWord);
+			
+			// composite word, split into original words
+			if (word.words) {
+				replace(word.words); 
+			}
+			else {
+				// split single word   
+				var selection = this.element.find(".word-split").wordEditor("select");
+				if (!selection)
+					return;
+				
+				var location = word.occurences[0],
+					splitWords = []; 
+					
+				if (selection.start > 0) {
+					splitWords.push({
+						text: word.text.substr(0, selection.start),
+						occurences: [{ start: location.start, length: selection.start }],
+						selected: ko.observable(true)
+					});
+				}
+				
+				splitWords.push({
+					text: word.text.substr(selection.start, selection.length),
+					occurences: [{ start: location.start + selection.start, length: selection.length }],
+					selected: ko.observable(true)
+				});
+				  
+				var restLength = location.length - selection.length - selection.start;
+				if (restLength > 0) {
+					splitWords.push({
+						text: word.text.substr(selection.start + selection.length, restLength),
+						occurences: [{ start: location.start + selection.start + selection.length, length: restLength }],
+						selected: ko.observable(true)
+					});
+				} 
+				
+				replace(splitWords);  
+			}
 		},
+        
+		_onSelectionChange: function(evt) {    
+		    var vm = this._viewModel;
+		                            
+			var newSelection = [];
+          	this.element.find(".word").each(function () {
+	        	var $word = $(this),
+					word = vm.words()[$word.attr("data-index")];
+				
+				if ($word.is(".ui-selected")) {
+					newSelection.push(word);
+					word.selected(true);
+				}
+				else
+					word.selected(false);
+			});			
+			vm.selection(newSelection); 
+			
+			var $wordEditor = this.element.find(".word-split");
+			if ($wordEditor.is(".wordEditor"))
+				$wordEditor.wordEditor("destroy");
+			
+		    if (newSelection.length == 1) {
+				var word = newSelection[0];
+				if (!word.words)         
+					$wordEditor.wordEditor({ word: word.text });
+			}
+   		},
 
 		_parseSentence: function(sentence) {
 			if (!sentence)
@@ -134,6 +224,26 @@
 			};
 
 			return split(sentence, " ");
+		},
+		
+		_compareWords: function(w1, w2) { 
+			return w1.occurences[0].start - w2.occurences[0].start;
+		},
+
+		_getContinuosOccurence: function(occurences) {
+			// returns a single merged occurence if the given sequence is continuos
+			if (occurences.length <= 1)
+				return occurences;
+				
+			var current = occurences[0].start;
+			for (var i = 0; i < occurences.length; i++) {    
+				var occurence = occurences[i];
+				if (current != occurence.start)
+					return null;
+				current += occurence.length;
+			}          
+			
+			return { start: occurences[0].start, length: current - occurences[0].start };
 		}
 	});
 
@@ -147,7 +257,6 @@
 	}
 
 	$.extend(ViewModel.prototype, {
-
 		toggleSelect: function(word) {
 			if (word.selected()) {
 				word.selected(false);

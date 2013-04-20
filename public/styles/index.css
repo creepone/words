@@ -42,7 +42,7 @@ body {
 	background-color: #f5f5f5;
 }
 
-.word[data-selected] { 
+.word.ui-selected, .word.ui-selecting { 
 	color: #3a87ad;
 	background-color: #d9edf7;
 	border-color: #bce8f1;
@@ -67,8 +67,15 @@ body {
 
 .sentenceEditor .merge,
 .sentenceEditor .split {
-	margin-top: 10px;
 	margin-left: 3px;
+}       
+
+.sentenceEditor .details {
+	margin-top: 10px;
+}       
+                           
+.sentenceEditor .wordEditor {
+	margin-left: 8px;
 }
 
 /* wordEditor */
