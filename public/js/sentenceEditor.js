@@ -41,13 +41,17 @@
 				"click .reset": "_onResetClick",
 				"click .merge": "_onMergeClick",
 				"click .split": "_onSplitClick",
-				"selectablestop .words": "_onSelectionChange"
+				"selectablestop .words": "_onSelectableStop"
 			});
 			
-			this.element.find(".words").selectable();
+			this.element.find(".words").selectable();  
+			
+			this._subscription = this._viewModel.selection
+				.subscribe(this._onSelectionChange.bind(this));
 		},
 
-		_destroy: function() {  
+		_destroy: function() {
+			this._subscription.dispose();  
 			ko.cleanNode(this.element[0]);
 			this.element.empty().removeClass("sentenceEditor");
 		},
@@ -173,9 +177,9 @@
 				replace(splitWords);  
 			}
 		},
-        
-		_onSelectionChange: function(evt) {    
-		    var vm = this._viewModel;
+               
+		_onSelectableStop: function(evt, ui) {
+			var vm = this._viewModel;
 		                            
 			var newSelection = [];
           	this.element.find(".word").each(function () {
@@ -189,14 +193,18 @@
 				else
 					word.selected(false);
 			});			
-			vm.selection(newSelection); 
+			vm.selection(newSelection);
+		},
+
+		_onSelectionChange: function(evt) {
 			
 			var $wordEditor = this.element.find(".word-split");
 			if ($wordEditor.is(".wordEditor"))
 				$wordEditor.wordEditor("destroy");
-			
-		    if (newSelection.length == 1) {
-				var word = newSelection[0];
+			     
+			var selection = this._viewModel.selection();
+		    if (selection.length == 1) {
+				var word = selection[0];
 				if (!word.words)         
 					$wordEditor.wordEditor({ word: word.text });
 			}
