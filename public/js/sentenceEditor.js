@@ -27,12 +27,21 @@
 
 	].join("");
 
-	// todo: creating of a word model with its structure is repeated, should be centralized
-
 	$.widget("words.sentenceEditor", {
 
 		model: function() {
-			return this._viewModel;
+			var plain = ko.toJS(this._viewModel);
+
+			return {
+				sentence: plain.sentence,
+				words: plain.words.map(function (w) {
+					return {
+						text: w.text,
+						baseForm: w.baseForm,
+						occurences: w.occurences
+					}
+				})
+			}
 		},
 
 		_create: function() {
@@ -96,15 +105,11 @@
 
 				if (vm.selection().length == 1) {
 					var word = vm.selection()[0];
-
-					vm.selection.remove(word);
 					word.selected(false);
 
 					var index = vm.words.indexOf(word);
 					if (index + 1 < vm.words().length) {
 						var nextWord = vm.words()[index + 1];
-
-						vm.selection.push(nextWord);
 						nextWord.selected(true);
 					}
 				}
@@ -113,7 +118,6 @@
 	   
 		_onResetClick: function(evt) {
 			this._viewModel.words.removeAll();
-			this._viewModel.selection.removeAll();
 		},
 
 		_onMergeClick: function(evt) {
@@ -132,7 +136,10 @@
 			 	mergedOccurence = this._getContinuosOccurence(occurences),
 				texts = singleWords.map(function (w) { return w.text });
 			         
-			var mergedWord = { selected: ko.observable(true), baseForm: ko.observable() };
+			var mergedWord = { 
+				selected: ko.observable(true), 
+				baseForm: ko.observable() 
+			};
 			
 			if (mergedOccurence) {
 				$.extend(mergedWord, {
@@ -149,10 +156,9 @@
 			}
 
 			vm.words.removeAll(words);
-			vm.selection.removeAll(words);
+			vm.words().forEach(function (w) { w.selected(false); });
 
 			vm.words.splice(index, 0, mergedWord);
-			vm.selection.push(mergedWord);
 		},       
 		
 		_onSplitClick: function(evt) {
@@ -161,12 +167,11 @@
 				word = vm.selection()[0];         
 				
 			var replace = function(splitWords) {
+				word.selected(false);
 				vm.words.remove(word);
-				vm.selection.remove(word);
 				
 				ko.utils.arrayPushAll(vm.words, splitWords);
-				ko.utils.arrayPushAll(vm.selection, splitWords);    
-				
+
 				vm.words.sort(self._compareWords);
 			};
 			
@@ -216,19 +221,12 @@
 		_onSelectableStop: function(evt, ui) {
 			var vm = this._viewModel;
 		                            
-			var newSelection = [];
           	this.element.find(".word").each(function () {
 	        	var $word = $(this),
 					word = vm.words()[$word.attr("data-index")];
 				
-				if ($word.is(".ui-selected")) {
-					newSelection.push(word);
-					word.selected(true);
-				}
-				else
-					word.selected(false);
+				word.selected($word.is(".ui-selected"));
 			});			
-			vm.selection(newSelection);
 		},
 
 		_onSelectionChange: function(evt) {
@@ -309,9 +307,15 @@
 		$.extend(this, {
 			sentence: ko.observable(""),
 			validationState: ko.observable(),
-			words: ko.observableArray(),
-			selection: ko.observableArray()
-		})
+			words: ko.observableArray()
+		});
+
+		// add computed selection for convenience
+		this.selection = ko.computed(function () {
+			return ko.utils.arrayFilter(this.words(), function (word) {
+				return word.selected();
+			});
+		}, this);
 	}
 
 })(jQuery);
