@@ -5,12 +5,12 @@
 			"<button class=\"close reset\"><i class=\"icon-repeat\"></i></button>",
 		"</div>",
 		
-		"<div class=\"control-group\" data-bind=\"if: !words().length, css: validationState()\">",
+		"<div class=\"control-group sentence\" data-bind=\"if: !words().length, css: validationState()\">",
 			"<input data-bind=\"value: sentence, valueUpdate: ['afterkeydown', 'afterpaste']\" type=\"text\" class=\"span11\" placeholder=\"Enter the sentence and press the Return key.\" />",
 		"</div>",
 		
 		"<div class=\"words\" data-bind=\"foreach: words()\">",
-			"<span class=\"word\" data-bind=\"text: text, css: { 'ui-selected': selected() }, attr: { 'data-index': $index }\"></span>",
+			"<span class=\"word\" data-bind=\"text: text, css: { 'ui-selected': selected(), 'ready': !!baseForm() }, attr: { 'data-index': $index }\"></span>",
 		"</div>",
 
 		"<div class=\"details\" data-bind=\"if: selection().length > 1\">",
@@ -20,11 +20,20 @@
 		"<div class=\"details\" data-bind=\"if: selection().length == 1\">",
 			"<button class=\"btn btn-mini split\">Split</button>",
 			"<span class=\"word-split\"></span>",
+			"<div class=\"baseForm\">",
+				"<input type=\"text\" autocomplete=\"off\" placeholder=\"Base form\" data-bind=\"value: selection()[0].baseForm, valueUpdate: ['afterkeydown', 'afterpaste']\" />",
+			"</div>",
 		"</div>"
 
 	].join("");
 
+	// todo: creating of a word model with its structure is repeated, should be centralized
+
 	$.widget("words.sentenceEditor", {
+
+		model: function() {
+			return this._viewModel;
+		},
 
 		_create: function() {
 
@@ -37,7 +46,8 @@
 			ko.applyBindings(this._viewModel, this.element[0]);
 
 			this._on({ 
-				"keydown input": "_onInputKeydown",
+				"keydown .sentence input": "_onSentenceInputKeydown",
+				"keydown .baseForm input": "_onBaseFormInputKeydown",
 				"click .reset": "_onResetClick",
 				"click .merge": "_onMergeClick",
 				"click .split": "_onSplitClick",
@@ -56,7 +66,7 @@
 			this.element.empty().removeClass("sentenceEditor");
 		},
 
-		_onInputKeydown: function(evt) {
+		_onSentenceInputKeydown: function(evt) {
 
 			this._viewModel.validationState("");
 
@@ -73,11 +83,33 @@
 				var vm = this._viewModel;
 				words.map(function (word) {
 					vm.words.push($.extend(word, {
-						selected: ko.observable(false)
+						selected: ko.observable(false),
+						baseForm: ko.observable()
 					}));
 				});
 			}
 		}, 
+
+		_onBaseFormInputKeydown: function(evt) {
+			if (evt.which == 13) {
+				var vm = this._viewModel;
+
+				if (vm.selection().length == 1) {
+					var word = vm.selection()[0];
+
+					vm.selection.remove(word);
+					word.selected(false);
+
+					var index = vm.words.indexOf(word);
+					if (index + 1 < vm.words().length) {
+						var nextWord = vm.words()[index + 1];
+
+						vm.selection.push(nextWord);
+						nextWord.selected(true);
+					}
+				}
+			}
+		},
 	   
 		_onResetClick: function(evt) {
 			this._viewModel.words.removeAll();
@@ -100,7 +132,7 @@
 			 	mergedOccurence = this._getContinuosOccurence(occurences),
 				texts = singleWords.map(function (w) { return w.text });
 			         
-			var mergedWord = { selected: ko.observable(true) };
+			var mergedWord = { selected: ko.observable(true), baseForm: ko.observable() };
 			
 			if (mergedOccurence) {
 				$.extend(mergedWord, {
@@ -155,14 +187,16 @@
 					splitWords.push({
 						text: word.text.substr(0, selection.start),
 						occurences: [{ start: location.start, length: selection.start }],
-						selected: ko.observable(true)
+						selected: ko.observable(true), 
+						baseForm: ko.observable()
 					});
 				}
 				
 				splitWords.push({
 					text: word.text.substr(selection.start, selection.length),
 					occurences: [{ start: location.start + selection.start, length: selection.length }],
-					selected: ko.observable(true)
+					selected: ko.observable(true),
+					baseForm: ko.observable()
 				});
 				  
 				var restLength = location.length - selection.length - selection.start;
@@ -170,7 +204,8 @@
 					splitWords.push({
 						text: word.text.substr(selection.start + selection.length, restLength),
 						occurences: [{ start: location.start + selection.start + selection.length, length: restLength }],
-						selected: ko.observable(true)
+						selected: ko.observable(true),
+						baseForm: ko.observable()
 					});
 				} 
 				
@@ -203,10 +238,14 @@
 				$wordEditor.wordEditor("destroy");
 			     
 			var selection = this._viewModel.selection();
-		    if (selection.length == 1) {
+			if (selection.length == 1) {
 				var word = selection[0];
 				if (!word.words)         
 					$wordEditor.wordEditor({ word: word.text });
+
+				this.element.find(".baseForm input")
+					.typeahead({ source: this._queryTypeahead.bind(this) })
+					.focus();
 			}
    		},
 
@@ -252,6 +291,17 @@
 			}          
 			
 			return { start: occurences[0].start, length: current - occurences[0].start };
+		},
+
+		_queryTypeahead: function(query) {
+			var selection = this._viewModel.selection();
+		    if (selection.length == 1) {
+				var word = selection[0];
+
+				if (word.text.indexOf(query) == 0)
+					return [ word.text ];
+			}
+			return [];
 		}
 	});
 
@@ -263,18 +313,5 @@
 			selection: ko.observableArray()
 		})
 	}
-
-	$.extend(ViewModel.prototype, {
-		toggleSelect: function(word) {
-			if (word.selected()) {
-				word.selected(false);
-				this.selection.remove(word);
-			}
-			else {
-				word.selected(true);
-				this.selection.push(word);
-			}
-		}
-	});
 
 })(jQuery);
