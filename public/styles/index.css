@@ -30,7 +30,7 @@ body {
 .word {
 	display: inline-block;
 	padding: 5px 10px;
-	margin: 0 2px;
+	margin: 0 2px 4px 2px;
 	background-color: #fff;
 	border: 1px solid #ddd;
 	-webkit-border-radius: 5px;
