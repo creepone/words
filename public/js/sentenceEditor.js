@@ -1,6 +1,7 @@
 (function($){
 
 	var _markup = [
+		"<button class=\"close cancel\">&times;</button>",
 		"<div data-bind=\"if: words().length\">",
 			"<button class=\"close reset\"><i class=\"icon-repeat\"></i></button>",
 		"</div>",
@@ -44,6 +45,15 @@
 			}
 		},
 
+		validate: function() {
+			if (!this._viewModel.sentence()) {
+				this._viewModel.validationState("error");
+				return false;
+			}
+
+			return true;
+		},
+
 		_create: function() {
 
 			this.element
@@ -58,6 +68,7 @@
 				"keydown .sentence input": "_onSentenceInputKeydown",
 				"keydown .baseForm input": "_onBaseFormInputKeydown",
 				"click .reset": "_onResetClick",
+				"click .cancel": "_onCancelClick",
 				"click .merge": "_onMergeClick",
 				"click .split": "_onSplitClick",
 				"selectablestop .words": "_onSelectableStop"
@@ -118,6 +129,10 @@
 	   
 		_onResetClick: function(evt) {
 			this._viewModel.words.removeAll();
+		},
+
+		_onCancelClick: function(evt) {
+			this._trigger("cancel");
 		},
 
 		_onMergeClick: function(evt) {

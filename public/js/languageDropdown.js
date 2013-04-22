@@ -21,10 +21,34 @@
 
 	$.widget("words.languageDropdown", {
 
+		select: function(iso) {
+
+			if (!iso) {
+				if (!this._viewModel.iso)
+					return null;
+
+				return { 
+					iso: this._viewModel.iso,
+					name: this._viewModel.name()
+				};
+			}
+
+			this._viewModel.selectLanguage(iso);
+			$(this.element).removeClass("error");
+		},
+
+		validate: function() {
+			if (!this._viewModel.iso) {
+				$(this.element).addClass("error");
+				return false;
+			}
+			return true;
+		},
+
 		_create: function() {
 
 			this.element
-				.addClass("btn-group")
+				.addClass("btn-group languageDropdown")
 				.append(_markup);
 
 			this._viewModel = new ViewModel({
@@ -40,7 +64,7 @@
 
 		_destroy: function() {
 			ko.cleanNode(this.element[0]);
-			this.element.empty().removeClass("btn-group");
+			this.element.empty().removeClass("btn-group languageDropdown");
 		},
 
 		_onItemClick: function(evt) {
@@ -50,21 +74,6 @@
 				return;
 
 			this.select(iso);
-		},
-
-		select: function(iso) {
-
-			if (!iso) {
-				if (!this._viewModel.iso)
-					return null;
-
-				return { 
-					iso: this._viewModel.iso,
-					name: this._viewModel.name()
-				};
-			}
-
-			this._viewModel.selectLanguage(iso);
 		}
 	});
 

@@ -2,10 +2,6 @@ body {
   padding-top: 60px; /* 60px to make the container go all the way to the bottom of the topbar */
 }
 
-#third {
-	margin-top: 10px;
-}
-
 .dropdown-menu {
     max-height: 250px;
     overflow: auto;
@@ -23,6 +19,10 @@ body {
 .img-flag {
 	float: left;
 	margin-right: 4px;
+}
+
+.languageDropdown.error a {
+	border-color: #b94a48;
 }
 
 /* sentenceEditor */
@@ -68,6 +68,12 @@ body {
 	position: absolute;
 	top: 3px;
 	left: 7px;
+}
+
+.close.cancel {
+	position: absolute;
+	top: 3px;
+	right: 7px;
 }
 
 .sentenceEditor .merge,
