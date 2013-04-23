@@ -1,6 +1,7 @@
 var express = require('express'),
 	sprite = require('node-sprite'),
-	stylus = require('stylus');
+	stylus = require('stylus'),
+	graph = require('./private/graph');
 
 var app = express(), compileStylus;
 
@@ -25,6 +26,14 @@ function configureApp(compileStylus) {
 		app.use(express.session({ secret: process.env.NEO4J_URL || 'secret' }));
 		app.use(app.router);
 		app.use(express.static(__dirname + '/public'));
+	});
+
+	// todo: move this to a separate module 
+	app.post('/sentences', function (req, res) {
+		graph.insertSentences(req.body.sentences, function (err, result) {
+			res.writeHead(200, { "Content-Type": "text/json" });
+			res.end(JSON.stringify(err ? { error: err } : result));
+		})
 	});
 
 	app.listen(process.env.PORT || 8081);

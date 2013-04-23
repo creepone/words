@@ -68,8 +68,44 @@
 			});
 		});
 
-		// todo: actual call to the service passing "data"
-		console.log(data);
+		services.postSentences(data, function (err, result) {
+			if (err) {
+				showAlert("An error occured when communicating with the server.", "alert-error");
+				console.log(err);
+			}
+			else {
+				showAlert("Sentences were saved.", "alert-success");
+				// todo: clear the widget values
+			}
+		});
+	}
+
+	// todo: move this to a separate module
+	var services = {
+		postSentences: function(sentences, callback) {
+			$.ajax({
+			    type: "POST",
+			    url: "/sentences",
+			    data: { sentences: sentences },
+			    dataType: "json",
+			    success: function(data) {
+					if (data.error)
+						callback(data.error);
+					
+					callback(null, data);
+				},
+			    failure: callback
+			});
+		}
+	}
+
+	function showAlert(message, alertType) {
+		var $content = $("<div class=\"alert fade in\"></div>").addClass(alertType);
+		$("<button type=\"button\" class=\"close\" data-dismiss=\"alert\">&times;</button>").appendTo($content);
+		$("<span />").text(message).appendTo($content);
+		$("#alert").empty().append($content);
+		
+		setTimeout(function () { $("#alert .alert").alert("close"); }, 2000);
 	}
 	
 }());

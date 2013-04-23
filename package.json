@@ -5,7 +5,9 @@
     "express": "3.1.x",
     "underscore": "1.4.x",
     "node-sprite": "0.1.x",
-    "stylus": "*"
+    "stylus": "*",
+    "neo4j-js": "*",
+    "async": "0.2.x"
   },
   "engines": {
     "node": "0.8.x",
