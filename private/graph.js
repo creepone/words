@@ -13,7 +13,7 @@ _.extend(exports, {
 			sentences: sentences,
 			words: _.flatten(
 				sentences.map(function (s) { 
-					return s.words.map(function (w) { 
+					return (s.words || []).map(function (w) { 
 						return _.extend(w, { sentence: s }); 
 					})
 				})
@@ -29,7 +29,7 @@ _.extend(exports, {
 			_.partial(createUsages, o)
 		], 
 		function (err) {
-			if (err) callback(err);
+			if (err) return callback(err);
 			console.log(o);
 			callback(null, {});
 		});

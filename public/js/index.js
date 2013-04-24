@@ -90,7 +90,7 @@
 			    dataType: "json",
 			    success: function(data) {
 					if (data.error)
-						callback(data.error);
+						return callback(data.error);
 					
 					callback(null, data);
 				},
