@@ -35,13 +35,17 @@
 
 			return {
 				sentence: plain.sentence,
-				words: plain.words.map(function (w) {
-					return {
-						text: w.text,
-						baseForm: w.baseForm,
-						occurences: w.occurences
-					}
-				})
+				words: plain.words
+						.filter(function (w) {
+							return w.text && w.baseForm;
+						})
+						.map(function (w) {
+							return {
+								text: w.text,
+								baseForm: w.baseForm,
+								occurences: w.occurences
+							}
+						})
 			}
 		},
 
