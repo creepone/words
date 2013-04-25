@@ -152,8 +152,8 @@ function connectSentences(o, callback) {
 			if (i < j) {
 				connections.push("n" + i + "-[:TRANSLATES]-n" + j);
 			}
-		})
-	})
+		});
+	});
 
 	cypherQuery += connections.join(",");
 
