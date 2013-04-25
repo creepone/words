@@ -31,6 +31,9 @@ function configureApp(compileStylus) {
 	// todo: move this to a separate module 
 	app.post('/sentences', function (req, res) {
 		graph.insertSentences(req.body.sentences, function (err, result) {
+			if (err)
+				console.log(err);
+
 			res.writeHead(200, { "Content-Type": "text/json" });
 			res.end(JSON.stringify(err ? { error: err } : result));
 		})
